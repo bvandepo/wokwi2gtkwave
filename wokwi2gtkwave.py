@@ -3,6 +3,12 @@
 #B. Vandeportaele 2021
 # à lancer avec la commande python3 wokwi2gtkwave.py   dans le dossier de téléchargement des fichiers .vcd
 
+#TODO:
+#générer à partir d'une variable chemin: C:\\Users\\travailleur\\Desktop\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin\\gtkwave  pour exec+bat
+#arg pour passer les emplacements si pas par défaut
+#variables de chemin à régler au début du script
+
+
 import os
 import sys
 import math
@@ -21,10 +27,25 @@ import time
 def traiteVCD(filename_in,filename_out):
     fin = open(filename_in, "r")
     fout = open(filename_out, "w")
+    previous_time=0
     for line in fin.readlines():
       lineout = line.replace("(heure d’été d’Europe centrale)", "")
       lineout = lineout.replace("(heure normale d’Europe centrale)", "") #avec le changement d'heure....
-      fout.write(lineout)          
+      #ne marche pas sous windows... :( du coup je coupe à partir de (
+      if lineout.startswith('$date'):
+            pos=lineout.find('(')
+            if pos!=-1: #found
+                lineout=lineout[0:pos]+'$end\n'
+      #number doit être croissant;
+      if lineout.startswith('#'):
+          current_time=int(lineout[1:])
+          #print("current_time="+str(current_time))
+          if current_time<previous_time:
+              print("Error: Time backtracking detected in VCD file!")
+          else:
+              previous_time=current_time              
+      fout.write(lineout)
+      fout.write("\n") #pour s'assurer qu'il y a bien \n à la dernière ligne , c'est ça qui cause l'erreur  Time backtracking detected in VCD file!  qui fait planter gtkwave avec l'option #autozoom 
     fin.close()
     fout.close()
 #----------------------------------------------------
@@ -32,12 +53,6 @@ def traiteVCD(filename_in,filename_out):
 #filename_out="wokwi-logic2-out.vcd"
 #traiteVCD(filename_in,filename_out)
 
-
-#autozoom viré car plante de temps en temps à l'iut
-'''
-    defaultfilecontent = """do_initial_zoom_fit 1
-"""
-'''
 
 ################################################################################
 #crée un fichier de réglage gtkwave par défaut pour l'application 
@@ -86,14 +101,19 @@ global directoryforgtkwave
 
 
 if platform == "linux" or platform == "linux2":
-    print("linux")
+    print("linux supported")
+    pathToObserve='/home/bvandepo/Téléchargements/'
+    directoryforgtkwave="/home/bvandepo/Bureau/pythonb/wokwi2gtkwave/vcdforgtkwave"
 elif platform == "darwin":
-    print("OS X")
+    print("OS X not yet supported")
+    exit()
 elif platform == "win32":
-    print("Windows")    
+    print("Windows supported")
+    pathToObserve='C:\\Users\\travailleur\\Downloads'
+    directoryforgtkwave=""
 
     
-pathToObserve='/home/bvandepo/Téléchargements/'
+
 # https://stackoverflow.com/questions/4548684/how-to-get-the-seconds-since-epoch-from-the-time-date-output-of-gmtime
 #timeLastPKill= time.localtime()
 #print("timeLastPKill: "+ str(timeLastPKill) )
@@ -102,7 +122,7 @@ pathToObserve='/home/bvandepo/Téléchargements/'
 #print("timeLastPKill: "+ str(timeLastPKill) )
 
 #directoryforgtkwave="vcdforgtkwave"
-directoryforgtkwave="/home/bvandepo/Bureau/pythonb/wokwi2gtkwave/vcdforgtkwave"
+
 basename_filename_rc="gtkwaverc"
 
 ################################################################################  
@@ -129,9 +149,10 @@ class MonHandler(FileSystemEventHandler):
                currentTime = int(time.time())
                if currentTime-self.timeLastPKill>10: #tue les instances anciennes de gtkwave mais pas les récentes qui peuvent etre due à des analyseurs logiques en parallèle
                    self.timeLastPKill=currentTime
-                   commandline="pkill gtkwave &"       
-                   print("execution de: "+commandline)
-                   os.system(commandline)
+                   if platform == "linux" or platform == "linux2":
+                       commandline="pkill gtkwave &"       
+                       print("execution de: "+commandline)
+                       os.system(commandline)
                    nouvelleSimu=True               
                time.sleep(1)
                #else:
@@ -152,30 +173,38 @@ class MonHandler(FileSystemEventHandler):
                createRcFile(filename_rc)
                #commandline="mv \""+ filename_in +"\" " + directoryforgtkwave +"/";  print("execution de: "+commandline); os.system(commandline)
                #déplace le fichier en écrasant la cible si elle existe déjà (il faut indiquer dossier+nom en destination)
-               shutil.move(filename_in, os.path.join(directoryforgtkwave, basename_filename_in))
+               #shutil.move(filename_in, os.path.join(directoryforgtkwave, basename_filename_in))
                
                
                #filename_in=directoryforgtkwave+"/"+filename_in
                #filename_out=event.src_path.replace(".vcd","-out.vcd")
-               basename_filename_out=basename_filename_in.replace(".vcd",".VCD") #extension VCD pour éviter que la création d'un vcd dans le meme dossier rapelle on_modified....
+               #basename_filename_out=basename_filename_in.replace(".vcd",".VCD") #extension VCD pour éviter que la création d'un vcd dans le meme dossier rapelle on_modified....
+               basename_filename_out=basename_filename_in
                filename_out=os.path.join(directoryforgtkwave, basename_filename_out)
                print("basename_filename_out: "+basename_filename_out)
                print("filename_out: "+filename_out)
-               traiteVCD(os.path.join(directoryforgtkwave, basename_filename_in),filename_out)
+               #traiteVCD(os.path.join(directoryforgtkwave, basename_filename_in),filename_out)
+               traiteVCD(filename_in,filename_out)
                               
                basename_filename_gtkw=basename_filename_in.replace(".vcd",".gtkw")
                filename_gtkw=os.path.join(directoryforgtkwave, basename_filename_gtkw)
                print("filename_gtkw:"+filename_gtkw)
                createGtkwFile(filename_gtkw)
 
+               #mince sous windows, il n'y a pas de différentiation entre vcd et VCD...
+               
                #commandline="rm \"" +directoryforgtkwave+"/"+filename_in+"\""; print("execution de: "+commandline);  os.system(commandline)
                try:
-                   os.remove(os.path.join(directoryforgtkwave, basename_filename_in))
+                   #os.remove(os.path.join(directoryforgtkwave, basename_filename_in))
+                   os.remove(filename_in)
                except OSError:
-                   print ("Deletion of the file %s failed" % os.path.join(directoryforgtkwave, basename_filename_in))
+                   print ("Deletion of the file %s failed" % os.remove(filename_in) ) #os.path.join(directoryforgtkwave, basename_filename_in))
                    
-
-               commandline="gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\" & " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger               
+               if platform == "linux" or platform == "linux2":
+                   commandline="gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\" & " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+               elif platform == "win32":
+                   commandline="START \"\" C:\\Users\\travailleur\\Desktop\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin\\gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\"  " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   
                #commandline="pkill gtkwave & gtkwave "+"\"" +filename_out+"\"" +" "+"\"" +filename_gtkw+"\"" + " & "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger             
                print("execution de: "+commandline)
                os.system(commandline)
@@ -197,6 +226,17 @@ class MonHandler(FileSystemEventHandler):
                    commandline="chmod a+x "+filename_script
                    print("execution de: "+commandline)
                    os.system(commandline)
+               elif platform == "win32":                
+                   basename_filename_script="showtraces.bat"
+                   filename_script=os.path.join(directoryforgtkwave,basename_filename_script)
+                   fileExists=os.path.isfile(filename_script)
+                   if nouvelleSimu==True:
+                       fout = open(filename_script, "w") #write                                   
+                   else:
+                       fout = open(filename_script, "a") #append               
+                   commandline="START \"\" gtkwave --slider-zoom   "+"\"" +basename_filename_out+"\" \"" +basename_filename_gtkw+"\" \"" +filename_rc+"\"  \n"  #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger                             
+                   fout.write(commandline)                          
+                   fout.close()                                  
 
                
                #print("execution de: "+commandline +" terminée")               
