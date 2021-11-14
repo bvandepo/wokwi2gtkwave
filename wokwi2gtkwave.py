@@ -24,6 +24,8 @@ from watchdog.observers import Observer
 #doc dans : https://pythonhosted.org/watchdog/api.html#watchdog.observers.Observer
 import time
 
+debug=False
+
 #----------------------------------------------------
 def repairVcdFile(filename_in, filename_out):
     fin = open(filename_in, "r")
@@ -101,14 +103,14 @@ global directoryToStore
 
 
 if platform == "linux" or platform == "linux2":
-    print("linux supported")
+    if debug: print("linux supported")
     directoryToScan= '/home/bvandepo/Téléchargements/'
     directoryToStore= "/home/bvandepo/Bureau/pythonb/wokwi2gtkwave/vcdforgtkwave"
 elif platform == "darwin":
     print("OS X not yet supported")
     exit()
 elif platform == "win32":
-    print("Windows supported")
+    if debug: print("Windows supported")
     directoryToScan= 'C:\\Users\\travailleur\\Downloads'
     directoryToStore= ""
 
@@ -148,21 +150,21 @@ class MyEventHandler(FileSystemEventHandler):
                    self.timeLastPKill=currentTime
                    if platform == "linux" or platform == "linux2":
                        commandLine="pkill gtkwave &"
-                       print("running: "+commandLine)
+                       if debug: print("running: "+commandLine)
                        os.system(commandLine)
                    isANewSimulation=True
                time.sleep(1)
                filename_in=event.src_path.replace("./","")  #nom du fichier avec chemin complet
                basename_in=os.path.basename(filename_in)
                
-               print("filename_in: "+filename_in)
+               if debug: print("filename_in: "+filename_in)
                #commandLine="mkdir -p " + directoryforgtkwave;  print("execution de: "+commandLine); os.system(commandLine)
                try:
                    os.mkdir(directoryToStore)
                except OSError:
-                   print ("Creation of the directory %s failed" % directoryToStore)
+                   if debug: print ("Creation of the directory %s failed" % directoryToStore)
                else:
-                   print ("Successfully created the directory %s " % directoryToStore)
+                   if debug: print ("Successfully created the directory %s " % directoryToStore)
 
                filename_rc=os.path.join(directoryToStore, basename_rc)
                createRcFile(filename_rc)
@@ -174,14 +176,14 @@ class MyEventHandler(FileSystemEventHandler):
                #basename_out=basename_in.replace(".vcd",".VCD") #extension VCD pour éviter que la création d'un vcd dans le meme dossier rapelle on_modified....
                basename_out=basename_in
                filename_out=os.path.join(directoryToStore, basename_out)
-               print("basename_out: "+basename_out)
-               print("filename_out: "+filename_out)
+               if debug: print("basename_out: "+basename_out)
+               if debug: print("filename_out: "+filename_out)
                #repairVcdFile(os.path.join(directoryforgtkwave, basename_in),filename_out)
                repairVcdFile(filename_in, filename_out)
                               
                basename_gtkw=basename_in.replace(".vcd",".gtkw")
                filename_gtkw=os.path.join(directoryToStore, basename_gtkw)
-               print("filename_gtkw:"+filename_gtkw)
+               if debug: print("filename_gtkw:"+filename_gtkw)
                createGtkwFile(filename_gtkw)
 
                #mince sous windows, il n'y a pas de différentiation entre vcd et VCD...
@@ -198,7 +200,7 @@ class MyEventHandler(FileSystemEventHandler):
                    commandLine="START \"\" C:\\Users\\travailleur\\Desktop\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin\\gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\"  " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
                    
                #commandLine="pkill gtkwave & gtkwave "+"\"" +filename_out+"\"" +" "+"\"" +filename_gtkw+"\"" + " & "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
-               print("running: "+commandLine)
+               if debug: print("running: "+commandLine)
                os.system(commandLine)
 
                if platform == "linux" or platform == "linux2":
@@ -216,7 +218,7 @@ class MyEventHandler(FileSystemEventHandler):
                    fout.write(commandLine)
                    fout.close()                
                    commandLine="chmod a+x "+filename_script
-                   print("running: "+commandLine)
+                   if debug: print("running: "+commandLine)
                    os.system(commandLine)
                elif platform == "win32":                
                    basename_script="showtraces.bat"
@@ -235,7 +237,7 @@ class MyEventHandler(FileSystemEventHandler):
                time.sleep(0.1) #il faut laisser un peu de temps entre les 2 appels de gtkwave sinon il ouvre 2 fois le meme fichier
 ################################################################################
 def main():
-  print("automatise gtkwave pour Wokwi.\n B. Vandeportaele IUT GEII 2021\nFonctionne avec plusieurs analyseurs logiques, avec 1 fichier VCD par analyseur")  
+  print("Wokwi2gtkwave\n B. Vandeportaele IUT GEII 2021\nCan be used with multiple Logic Analizer, with one file for each analyzer")
   #if len(sys.argv)==2:
   #  inf=sys.argv[1]
   #  ouf=sys.argv[2]
