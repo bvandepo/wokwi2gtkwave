@@ -13,6 +13,7 @@ import os
 import sys
 import math
 
+
 import shutil
 from sys import platform
  
@@ -24,7 +25,7 @@ from watchdog.observers import Observer
 import time
 
 #----------------------------------------------------
-def traiteVCD(filename_in,filename_out):
+def repairVcdFile(filename_in, filename_out):
     fin = open(filename_in, "r")
     fout = open(filename_out, "w")
     previous_time=0
@@ -51,7 +52,7 @@ def traiteVCD(filename_in,filename_out):
 #----------------------------------------------------
 #filename_in="wokwi-logic2.vcd"
 #filename_out="wokwi-logic2-out.vcd"
-#traiteVCD(filename_in,filename_out)
+#repairVcdFile(filename_in,filename_out)
 
 
 ################################################################################
@@ -95,22 +96,21 @@ logic.D7
 #createGtkwFile("test.gtkw")
 ################################################################################
 #pathToObserve='./'
-global pathToObserve
-global basename_filename_rc
-global directoryforgtkwave
+global directoryToScan
+global directoryToStore
 
 
 if platform == "linux" or platform == "linux2":
     print("linux supported")
-    pathToObserve='/home/bvandepo/Téléchargements/'
-    directoryforgtkwave="/home/bvandepo/Bureau/pythonb/wokwi2gtkwave/vcdforgtkwave"
+    directoryToScan= '/home/bvandepo/Téléchargements/'
+    directoryToStore= "/home/bvandepo/Bureau/pythonb/wokwi2gtkwave/vcdforgtkwave"
 elif platform == "darwin":
     print("OS X not yet supported")
     exit()
 elif platform == "win32":
     print("Windows supported")
-    pathToObserve='C:\\Users\\travailleur\\Downloads'
-    directoryforgtkwave=""
+    directoryToScan= 'C:\\Users\\travailleur\\Downloads'
+    directoryToStore= ""
 
     
 
@@ -123,20 +123,17 @@ elif platform == "win32":
 
 #directoryforgtkwave="vcdforgtkwave"
 
-basename_filename_rc="gtkwaverc"
 
 ################################################################################  
-class MonHandler(FileSystemEventHandler):
+class MyEventHandler(FileSystemEventHandler):
     timeLastPKill=0
     def __init__(self):
         self.timeLastPKill = int(time.time())
-        #print("timeLastPKill: "+ str(self.timeLastPKill) )        
-    # cette méthode sera appelée à chaque fois qu'un fichier est modifié
     def on_modified(self, event):
-        global pathToObserve
-        global basename_filename_rc
-        global directoryforgtkwave
-        nouvelleSimu=False        #pour réinitialiser le fichier bash
+        global directoryToScan
+        global directoryToStore
+        basename_rc = "gtkwaverc"
+        isANewSimulation=False        #variable used to group a set of multiple simulation in the same script file
 
         #pour gérer / ou \ automatiquement:
         ##(os.path.join(src, filename), os.path.join(dst, filename))
@@ -144,102 +141,97 @@ class MonHandler(FileSystemEventHandler):
         
         if os.path.isfile(event.src_path):
             if event.src_path.endswith(('.vcd')):
-               print("Un fichier vcd vient d'être téléchargé:" + str( event.src_path))
+               print("A new vcd file has been downloaded:" + str( event.src_path))
                 #determine si il faut tuer gtkwave
                currentTime = int(time.time())
                if currentTime-self.timeLastPKill>10: #tue les instances anciennes de gtkwave mais pas les récentes qui peuvent etre due à des analyseurs logiques en parallèle
                    self.timeLastPKill=currentTime
                    if platform == "linux" or platform == "linux2":
-                       commandline="pkill gtkwave &"       
-                       print("execution de: "+commandline)
-                       os.system(commandline)
-                   nouvelleSimu=True               
+                       commandLine="pkill gtkwave &"
+                       print("running: "+commandLine)
+                       os.system(commandLine)
+                   isANewSimulation=True
                time.sleep(1)
-               #else:
-               #    time.sleep(2)
                filename_in=event.src_path.replace("./","")  #nom du fichier avec chemin complet
-               basename_filename_in=os.path.basename(filename_in)
+               basename_in=os.path.basename(filename_in)
                
                print("filename_in: "+filename_in)
-               #commandline="mkdir -p " + directoryforgtkwave;  print("execution de: "+commandline); os.system(commandline)
+               #commandLine="mkdir -p " + directoryforgtkwave;  print("execution de: "+commandLine); os.system(commandLine)
                try:
-                   os.mkdir(directoryforgtkwave)
+                   os.mkdir(directoryToStore)
                except OSError:
-                   print ("Creation of the directory %s failed" % directoryforgtkwave)
+                   print ("Creation of the directory %s failed" % directoryToStore)
                else:
-                   print ("Successfully created the directory %s " % directoryforgtkwave)
+                   print ("Successfully created the directory %s " % directoryToStore)
 
-               filename_rc=os.path.join(directoryforgtkwave, basename_filename_rc)
+               filename_rc=os.path.join(directoryToStore, basename_rc)
                createRcFile(filename_rc)
-               #commandline="mv \""+ filename_in +"\" " + directoryforgtkwave +"/";  print("execution de: "+commandline); os.system(commandline)
+               #commandLine="mv \""+ filename_in +"\" " + directoryforgtkwave +"/";  print("execution de: "+commandLine); os.system(commandLine)
                #déplace le fichier en écrasant la cible si elle existe déjà (il faut indiquer dossier+nom en destination)
-               #shutil.move(filename_in, os.path.join(directoryforgtkwave, basename_filename_in))
-               
-               
+               #shutil.move(filename_in, os.path.join(directoryforgtkwave, basename_in))
                #filename_in=directoryforgtkwave+"/"+filename_in
                #filename_out=event.src_path.replace(".vcd","-out.vcd")
-               #basename_filename_out=basename_filename_in.replace(".vcd",".VCD") #extension VCD pour éviter que la création d'un vcd dans le meme dossier rapelle on_modified....
-               basename_filename_out=basename_filename_in
-               filename_out=os.path.join(directoryforgtkwave, basename_filename_out)
-               print("basename_filename_out: "+basename_filename_out)
+               #basename_out=basename_in.replace(".vcd",".VCD") #extension VCD pour éviter que la création d'un vcd dans le meme dossier rapelle on_modified....
+               basename_out=basename_in
+               filename_out=os.path.join(directoryToStore, basename_out)
+               print("basename_out: "+basename_out)
                print("filename_out: "+filename_out)
-               #traiteVCD(os.path.join(directoryforgtkwave, basename_filename_in),filename_out)
-               traiteVCD(filename_in,filename_out)
+               #repairVcdFile(os.path.join(directoryforgtkwave, basename_in),filename_out)
+               repairVcdFile(filename_in, filename_out)
                               
-               basename_filename_gtkw=basename_filename_in.replace(".vcd",".gtkw")
-               filename_gtkw=os.path.join(directoryforgtkwave, basename_filename_gtkw)
+               basename_gtkw=basename_in.replace(".vcd",".gtkw")
+               filename_gtkw=os.path.join(directoryToStore, basename_gtkw)
                print("filename_gtkw:"+filename_gtkw)
                createGtkwFile(filename_gtkw)
 
                #mince sous windows, il n'y a pas de différentiation entre vcd et VCD...
-               
-               #commandline="rm \"" +directoryforgtkwave+"/"+filename_in+"\""; print("execution de: "+commandline);  os.system(commandline)
+               #commandLine="rm \"" +directoryforgtkwave+"/"+filename_in+"\""; print("execution de: "+commandLine);  os.system(commandLine)
                try:
-                   #os.remove(os.path.join(directoryforgtkwave, basename_filename_in))
+                   #os.remove(os.path.join(directoryforgtkwave, basename_in))
                    os.remove(filename_in)
                except OSError:
-                   print ("Deletion of the file %s failed" % os.remove(filename_in) ) #os.path.join(directoryforgtkwave, basename_filename_in))
+                   print ("Deletion of the file %s failed" % os.remove(filename_in) ) #os.path.join(directoryforgtkwave, basename_in))
                    
                if platform == "linux" or platform == "linux2":
-                   commandline="gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\" & " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   commandLine="gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\" & " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
                elif platform == "win32":
-                   commandline="START \"\" C:\\Users\\travailleur\\Desktop\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin\\gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\"  " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   commandLine="START \"\" C:\\Users\\travailleur\\Desktop\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin\\gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\"  " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
                    
-               #commandline="pkill gtkwave & gtkwave "+"\"" +filename_out+"\"" +" "+"\"" +filename_gtkw+"\"" + " & "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger             
-               print("execution de: "+commandline)
-               os.system(commandline)
+               #commandLine="pkill gtkwave & gtkwave "+"\"" +filename_out+"\"" +" "+"\"" +filename_gtkw+"\"" + " & "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+               print("running: "+commandLine)
+               os.system(commandLine)
 
                if platform == "linux" or platform == "linux2":
-                   basename_filename_script="showtraces.sh"
-                   filename_script=os.path.join(directoryforgtkwave,basename_filename_script)
+                   basename_script="showtraces.sh"
+                   filename_script=os.path.join(directoryToStore, basename_script)
                    fileExists=os.path.isfile(filename_script)
-                   if nouvelleSimu==True:
+                   if isANewSimulation==True:
                        fout = open(filename_script, "w") #write                                   
                        #if not fileExists:
                        fout.write("#!/bin/bash\n")
                    else:
                        fout = open(filename_script, "a") #append               
-                   #commandline="gtkwave --slider-zoom   "+"\"" +filename_out+"\"" +" "+"\"" +filename_gtkw+"\" \""+rcFile+"\" & \n" #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
-                   commandline="gtkwave --slider-zoom   "+"\"" +basename_filename_out+"\" \"" +basename_filename_gtkw+"\" \"" +filename_rc+"\" & "  #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger                             
-                   fout.write(commandline)                          
+                   #commandLine="gtkwave --slider-zoom   "+"\"" +filename_out+"\"" +" "+"\"" +filename_gtkw+"\" \""+rcFile+"\" & \n" #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   commandLine="gtkwave --slider-zoom   "+"\"" +basename_out+"\" \"" +basename_gtkw+"\" \"" +filename_rc+"\" & "  #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   fout.write(commandLine)
                    fout.close()                
-                   commandline="chmod a+x "+filename_script
-                   print("execution de: "+commandline)
-                   os.system(commandline)
+                   commandLine="chmod a+x "+filename_script
+                   print("running: "+commandLine)
+                   os.system(commandLine)
                elif platform == "win32":                
-                   basename_filename_script="showtraces.bat"
-                   filename_script=os.path.join(directoryforgtkwave,basename_filename_script)
+                   basename_script="showtraces.bat"
+                   filename_script=os.path.join(directoryToStore, basename_script)
                    fileExists=os.path.isfile(filename_script)
-                   if nouvelleSimu==True:
+                   if isANewSimulation==True:
                        fout = open(filename_script, "w") #write                                   
                    else:
                        fout = open(filename_script, "a") #append               
-                   commandline="START \"\" gtkwave --slider-zoom   "+"\"" +basename_filename_out+"\" \"" +basename_filename_gtkw+"\" \"" +filename_rc+"\"  \n"  #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger                             
-                   fout.write(commandline)                          
+                   commandLine="START \"\" gtkwave --slider-zoom   "+"\"" +basename_out+"\" \"" +basename_gtkw+"\" \"" +filename_rc+"\"  \n"  #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   fout.write(commandLine)
                    fout.close()                                  
 
                
-               #print("execution de: "+commandline +" terminée")               
+               #print("execution de: "+commandLine +" terminée")
                time.sleep(0.1) #il faut laisser un peu de temps entre les 2 appels de gtkwave sinon il ouvre 2 fois le meme fichier
 ################################################################################
 def main():
@@ -250,7 +242,7 @@ def main():
   observer = Observer()
   # Surveiller récursivement tous les événements du dossier pathToObserve
   # et appeler les méthodes de MonHandler quand quelque chose se produit
-  observer.schedule(MonHandler(), path=pathToObserve, recursive=True)
+  observer.schedule(MyEventHandler(), path=directoryToScan, recursive=True)
   observer.start()
   # L'observer travaille dans un thread séparé donc on fait une
   # boucle infinie pour maintenir le thread principal
