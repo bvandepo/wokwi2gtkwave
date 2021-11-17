@@ -127,7 +127,7 @@ elif platform == "darwin":
     exit()
 elif platform == "win32":
     if debug: print("Windows supported")
-    userName="travailleur"
+    userName=os.getenv('username') #"travailleur"
     directoryToScan= 'C:\\Users\\'+userName+'\\Downloads'
     directoryToStore="C:\\Users\\"+userName+"\\wokwi\\vcdforgtkwave"
     pathForGtkwaveBin="C:\\Users\\"+userName+"\\wokwi\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin"
