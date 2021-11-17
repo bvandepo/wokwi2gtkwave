@@ -8,6 +8,22 @@
 #arg pour passer les emplacements si pas par défaut
 #variables de chemin à régler au début du script
 
+########################################
+#https://stackoverflow.com/questions/1051254/check-if-python-package-is-installed
+#install automatically watchdog if not already installed
+import subprocess
+import sys
+
+reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
+installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
+
+if 'watchdog' in installed_packages:
+  print('watchdog pip package already installed')
+else: 
+  print('watchdog pip package missing, lets install it')
+  import pip
+  pip.main(['install','watchdog'])
+########################################
 
 import os
 import sys
@@ -111,9 +127,11 @@ elif platform == "darwin":
     exit()
 elif platform == "win32":
     if debug: print("Windows supported")
-    directoryToScan= 'C:\\Users\\travailleur\\Downloads'
-    directoryToStore= ""
-
+    userName="travailleur"
+    directoryToScan= 'C:\\Users\\'+userName+'\\Downloads'
+    directoryToStore="C:\\Users\\"+userName+"\\wokwi\\vcdforgtkwave"
+    pathForGtkwaveBin="C:\\Users\\"+userName+"\\wokwi\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin"
+    
     
 
 # https://stackoverflow.com/questions/4548684/how-to-get-the-seconds-since-epoch-from-the-time-date-output-of-gmtime
@@ -197,7 +215,8 @@ class MyEventHandler(FileSystemEventHandler):
                if platform == "linux" or platform == "linux2":
                    commandLine="gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\" & " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
                elif platform == "win32":
-                   commandLine="START \"\" C:\\Users\\travailleur\\Desktop\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin\\gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\"  " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   #commandLine="START \"\" C:\\Users\\travailleur\\Desktop\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin\\gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\"  " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   commandLine="START \"\"  "+ pathForGtkwaveBin + "\\gtkwave --slider-zoom   "+"\"" +filename_out+"\" \"" +filename_gtkw+"\" \"" +filename_rc+"\"  " #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
                    
                #commandLine="pkill gtkwave & gtkwave "+"\"" +filename_out+"\"" +" "+"\"" +filename_gtkw+"\"" + " & "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
                if debug: print("running: "+commandLine)
@@ -228,7 +247,8 @@ class MyEventHandler(FileSystemEventHandler):
                        fout = open(filename_script, "w") #write                                   
                    else:
                        fout = open(filename_script, "a") #append               
-                   commandLine="START \"\" gtkwave --slider-zoom   "+"\"" +basename_out+"\" \"" +basename_gtkw+"\" \"" +filename_rc+"\"  \n"  #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   #commandLine="START \"\" gtkwave --slider-zoom   "+"\"" +basename_out+"\" \"" +basename_gtkw+"\" \"" +filename_rc+"\"  \n"  #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
+                   commandLine="START \"\" "+ pathForGtkwaveBin + "\\gtkwave --slider-zoom   "+"\"" +basename_out+"\" \"" +basename_gtkw+"\" \"" +filename_rc+"\"  \n"  #sleep 1 "  #attention les noms de fichiers peuvent contenir des espaces, donc il faut les protéger
                    fout.write(commandLine)
                    fout.close()                                  
 
@@ -260,4 +280,3 @@ def main():
   return
 ################################################################################
 main()
-
