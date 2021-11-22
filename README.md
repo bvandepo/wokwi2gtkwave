@@ -95,7 +95,7 @@ if platform == "linux" or platform == "linux2":
 
 I've not yet tested, if you want me to add the support for this system, ask me.
 
-# Configuration of the browser to download automatically the VCD files in the download forlder
+# Configuration of the browser to download automatically the VCD files in the download folder
 
 ## Chromium
 You just have to set the download folder  in Parameters->advanced parameters->location  and to desactivate the option "always ask where to save the file"
