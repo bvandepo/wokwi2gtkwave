@@ -8,6 +8,10 @@
 #arg pour passer les emplacements si pas par défaut
 #variables de chemin à régler au début du script
 
+
+debug=False
+
+
 ########################################
 #https://stackoverflow.com/questions/1051254/check-if-python-package-is-installed
 #install automatically watchdog if not already installed
@@ -18,9 +22,9 @@ reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
 installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
 
 if 'watchdog' in installed_packages:
-  print('watchdog pip package already installed')
+  if debug: print('watchdog pip package already installed')
 else: 
-  print('watchdog pip package missing, lets install it')
+  if debug: print('watchdog pip package missing, lets install it')
   import pip
   pip.main(['install','watchdog'])
 ########################################
@@ -29,7 +33,7 @@ import os
 import sys
 import math
 
-
+ 
 import shutil
 from sys import platform
  
@@ -39,8 +43,6 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 #doc dans : https://pythonhosted.org/watchdog/api.html#watchdog.observers.Observer
 import time
-
-debug=False
 
 #----------------------------------------------------
 def repairVcdFile(filename_in, filename_out):
@@ -120,8 +122,24 @@ global directoryToStore
 
 if platform == "linux" or platform == "linux2":
     if debug: print("linux supported")
-    directoryToScan= '/home/bvandepo/Téléchargements/'
-    directoryToStore= "/home/bvandepo/Bureau/pythonb/wokwi2gtkwave/vcdforgtkwave"
+    directoryToScan=None
+    #to set manually the directory where the vcd files are downloaded:
+    #directoryToScan= '/home/bvandepo/Téléchargements/'
+    if directoryToScan is None: #if the directoryToScan is not set manually, try to set it automatically   
+        from pathlib import Path
+        directoryToScan = str(os.path.join(Path.home(), "Téléchargements"))  #French folder by default
+        if not os.path.isdir(directoryToScan):
+          directoryToScan = str(os.path.join(Path.home(), "Downloads"))      #English folder
+        if not os.path.isdir(directoryToScan):
+          print("The download folder has not been found automatically, please set it manually in the program")
+          exit(-5)
+    directoryToStore=None
+    #to set manually the directory where the vcd and gtkwave files are generated:
+    #directoryToStore= "/home/bvandepo/Bureau/pythonb/wokwi2gtkwave/vcdforgtkwave"
+    if directoryToStore is None: #if the directoryToScan is not set manually, try to set it automatically   
+        from pathlib import Path
+        directoryToStore = str(os.path.join(Path.home(), "wokwi/vcdforgtkwave"))  #French folder by default        
+    
 elif platform == "darwin":
     print("OS X not yet supported")
     exit()
