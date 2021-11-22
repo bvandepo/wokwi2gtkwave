@@ -66,7 +66,7 @@ def repairVcdFile(filename_in, filename_out):
           else:
               previous_time=current_time              
       fout.write(lineout)
-      fout.write("\n") #pour s'assurer qu'il y a bien \n à la dernière ligne , c'est ça qui cause l'erreur  Time backtracking detected in VCD file!  qui fait planter gtkwave avec l'option #autozoom 
+    fout.write("\n") #pour s'assurer qu'il y a bien \n à la dernière ligne , c'est ça qui cause l'erreur  Time backtracking detected in VCD file!  qui fait planter gtkwave avec l'option #autozoom 
     fin.close()
     fout.close()
 #----------------------------------------------------
