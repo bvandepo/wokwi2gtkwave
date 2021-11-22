@@ -1,15 +1,14 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*
 #B. Vandeportaele 2021
-# à lancer avec la commande python3 wokwi2gtkwave.py   dans le dossier de téléchargement des fichiers .vcd
+# à lancer avec la commande python wokwi2gtkwave.py dans ~/wokwi/ ou C:\Users\login\wokwi\
 
 #TODO:
-#générer à partir d'une variable chemin: C:\\Users\\travailleur\\Desktop\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin\\gtkwave  pour exec+bat
-#arg pour passer les emplacements si pas par défaut
-#variables de chemin à régler au début du script
+#arg pour passer les emplacements si autre que ceux par défaut
+#variables de chemin à régler plutot au début du script
 
 
-debug=False
+debug=False #set to True to activate display of debug messages
 
 
 ########################################
@@ -275,7 +274,7 @@ class MyEventHandler(FileSystemEventHandler):
                time.sleep(0.1) #il faut laisser un peu de temps entre les 2 appels de gtkwave sinon il ouvre 2 fois le meme fichier
 ################################################################################
 def main():
-  print("Wokwi2gtkwave\n B. Vandeportaele IUT GEII 2021\nCan be used with multiple Logic Analizer, with one file for each analyzer")
+  print("Wokwi2gtkwave\n B. Vandeportaele IUT GEII 2021\nCan be used with multiple Logic Analyzer, processing one file for each analyzer")
   #if len(sys.argv)==2:
   #  inf=sys.argv[1]
   #  ouf=sys.argv[2]
