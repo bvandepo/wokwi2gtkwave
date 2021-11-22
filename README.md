@@ -44,7 +44,7 @@ Open a cmd windows and type:
   python wokwi2gtkwave.py
 ```
 
-wokwi2gtkwave will then observe the vcd files downloaded in C:\Users\“yourlogin”\Downloads and process them automatically to C:\Users\“yourlogin”\wokwi\vcdforgtkwave , If the user wants to keep the files for a simulation, he just has to move or copy this folder. The default directories can be change by editing wokwi2gtkwave.py:
+wokwi2gtkwave will then observe the vcd files downloaded in C:\Users\“yourlogin”\Downloads and process them automatically to C:\Users\“yourlogin”\wokwi\vcdforgtkwave , If the user wants to keep the files for a simulation, he just has to move or copy this folder. The default directories can be changed by editing wokwi2gtkwave.py:
 
 ```
 elif platform == "win32":
