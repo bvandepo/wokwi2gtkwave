@@ -1,7 +1,7 @@
 # wokwi2gtkwave
 A Python script that automates the visualization of vcd files generated with Wokwi 
 
-##Description##
+## Description
 This project aims to facilitate the simulation of Arduino programs using the excellent Wokwi tools ( https://wokwi.com/ ). Wokwi embeds a 8 channel logic analyzer that can capture signals and  allows the users to download a Value Change Dump file for visualization and analysis using the tool gtkwave. Wokwi2gtkwave automatizes the many tasks required to show the VCD file each time it is downloaded by keeping track of file changes in the download directory:
 
 
@@ -20,15 +20,15 @@ It creates a directory containing the multiple VCD files of a simulation and man
 It automatically closes the old instances of gtkwave (supported only on Linux).
 
 
-##Requirements##
+## Requirements
 Wokwi2gtkwave requires this 2 software to be installed:
   - gtkwave
   - python3 (and watchdog pip module, who is installed automatically if not installed previously)
  
 
-#Installation and usage for Windows systems#
+# Installation and usage for Windows systems
 
-##Installation for Windows systems##
+## Installation for Windows systems
 
 Download and install Python 3.8.6: https://bvdp.inetdoc.net/files/cesi/gtkwave/python-3.8.6-amd64.exe
 
@@ -37,7 +37,7 @@ https://bvdp.inetdoc.net/files/cesi/gtkwave/gtkwave-3.3.100-bin-win32.zip
 
 Copy the wokwi2gtkwave.py file in the  C:\Users\“yourlogin”\wokwi 
 
-##Usage for Windows systems##
+## Usage for Windows systems
 Open a cmd windows and type:
 ```
   cd C:\Users\%username%\wokwi
@@ -55,9 +55,9 @@ elif platform == "win32":
     pathForGtkwaveBin="C:\\Users\\"+userName+"\\wokwi\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin"
 ```    
 
-#Installation and usage for Linux systems#
+# Installation and usage for Linux systems
 
-##Installation for Linux systems##
+## Installation for Linux systems
 Install dependencies:
 ```
    sudo apt install python3 gtkwave
@@ -76,7 +76,7 @@ Create a folder to receive the program and generated files:
   cp  wokwi2gtkwave.py  ~/wokwi
 ```
 
-##Usage for Linux systems##
+## Usage for Linux systems
 Open a terminal and type:
 ```
   cd ~wokwi
@@ -91,6 +91,6 @@ if platform == "linux" or platform == "linux2":
 ```
 
 
-#Installation and usage for MAC systems#
+# Installation and usage for MAC systems
 
 I've not yet tested, if you want me to add the support for this system, ask me.
