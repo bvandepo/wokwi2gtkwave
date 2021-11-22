@@ -11,7 +11,7 @@ It repairs the VCD files created by Wokwi for French Locale systems, as they con
 
 It generates a gtkwave configuration file that sets the autozoom feature ON so the display allows an overview of the signals to allow the user to zoom in the region of interrest.
 
-It generates a gtkwave file that sets the different signal name and organization to avoid the annoying task of grabbing signal to the signal windows in order to view them.
+It generates a gtkwave file that sets the different signal names and organization to avoid the annoying task of grabbing signals to the signal windows in order to view them.
 
 It manages the use of multiple logic analyzer components for which one VCD file is created for each logic analyzer (the name of the file being set using the attributes of the logic analyzer in the diagram.json file).
 
@@ -94,3 +94,19 @@ if platform == "linux" or platform == "linux2":
 # Installation and usage for MAC systems
 
 I've not yet tested, if you want me to add the support for this system, ask me.
+
+# Configuration of the browser to download automatically the VCD files in the download forlder
+
+## Chromium
+You just have to set the download folder  in Parameters->advanced parameters->location  and to desactivate the option "always ask where to save the file"
+
+## Firefox
+Firefox is a bit more careful and won't let you donwload the VCD file automatically because there is not MIME type information attached to the VCD file that tells Firefox that the download is secure. So we need to modify the settings:
+  - type the following URL in Firefox: about:config
+  - click on "Accept..."
+  - copy/paste the following preference name: browser.helperApps.neverAsk.saveToDisk
+  - click on the blue pen (Modify), then copy/paste in the text area: application/octet-stream
+  - click on the blue V to validate and then close the onglet
+
+## Midori
+Wokwi does not work with this browser...
