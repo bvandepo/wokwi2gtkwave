@@ -90,13 +90,14 @@ Check that gtkwave is in your PATH, the following command should return the loca
 Create a folder to receive the program and generated files:
 ```
   mkdir ~/wokwi
-  cp  wokwi2gtkwave.py  ~/wokwi
+  cp wokwi2gtkwave.py  ~/wokwi
+  chmod a+x ~/wokwi/wokwi2gtkwave.py
 ```
 
 ## Usage for Linux systems
 Open a terminal and type:
 ```
-  cd ~wokwi
+  cd ~/wokwi
   wokwi2gtkwave.py
 ```
 
