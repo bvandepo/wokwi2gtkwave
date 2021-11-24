@@ -9,7 +9,14 @@
 
 
 debug=False #set to True to activate display of debug messages
+  
+import os
+import sys
+import math
 
+ 
+import shutil
+from sys import platform
 
 ########################################
 #https://stackoverflow.com/questions/1051254/check-if-python-package-is-installed
@@ -27,14 +34,16 @@ else:
   import pip
   pip.main(['install','watchdog'])
 ########################################
+if platform == "win32":
+  if 'glob2' in installed_packages:
+    if debug: print('glob2 pip package already installed')
+  else: 
+    if debug: print('glob2 pip package missing, lets install it')
+    import pip
+    pip.main(['install','glob2'])
+    import glob
+########################################
 
-import os
-import sys
-import math
-
- 
-import shutil
-from sys import platform
  
 #inspiré de http://sametmax.com/reagir-a-un-changement-sur-un-fichier-avec-watchdog/
 #sudo pip3 install watchdog
@@ -49,6 +58,7 @@ def repairVcdFile(filename_in, filename_out):
     fout = open(filename_out, "w")
     previous_time=0
     for line in fin.readlines():
+      #this repair should not be required since 2021/11/24th as Uri has corrected Wokwi
       lineout = line.replace("(heure d’été d’Europe centrale)", "")
       lineout = lineout.replace("(heure normale d’Europe centrale)", "") #avec le changement d'heure....
       #ne marche pas sous windows... :( du coup je coupe à partir de (
@@ -137,7 +147,7 @@ if platform == "linux" or platform == "linux2":
     #directoryToStore= "/home/bvandepo/Bureau/pythonb/wokwi2gtkwave/vcdforgtkwave"
     if directoryToStore is None: #if the directoryToScan is not set manually, try to set it automatically   
         from pathlib import Path
-        directoryToStore = str(os.path.join(Path.home(), "wokwi/vcdforgtkwave"))  #French folder by default        
+        directoryToStore = str(os.path.join(Path.home(), "wokwi/vcdforgtkwave"))     
     
 elif platform == "darwin":
     print("OS X not yet supported")
@@ -147,9 +157,19 @@ elif platform == "win32":
     userName=os.getenv('username') #"travailleur"
     directoryToScan= 'C:\\Users\\'+userName+'\\Downloads'
     directoryToStore="C:\\Users\\"+userName+"\\wokwi\\vcdforgtkwave"
-    pathForGtkwaveBin="C:\\Users\\"+userName+"\\wokwi\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin"
-    
-    
+    pathForGtkwaveBin=None
+    #set the absolute path manually below to find the gtkwave binary
+    #pathForGtkwaveBin="C:\\Users\\"+userName+"\\wokwi\\gtkwave-3.3.100-bin-win32\\gtkwave\\bin"
+    #if the path is not set, then try to find it
+    if pathForGtkwaveBin is None:
+      #TODO recherche en recursif de gtkwave pour windows pour ceux qui dezippe pas dans un bon sous dossier.
+      directoryToSearchGtkwave = "C:\\Users\\"+userName+"\\wokwi"
+      for fichier in glob.iglob(os.path.join(directoryToSearchGtkwave, "**","gtkwave.exe"), recursive=True):        
+        pathForGtkwaveBin=os.path.dirname(fichier)
+        print("gtkwave.exe found in: "+pathForGtkwaveBin)
+        break #first trial should be the good one...
+      if pathForGtkwaveBin is None:
+        print("gtkwave.exe cannot be found in: "+directoryToSearchGtkwave)
 
 # https://stackoverflow.com/questions/4548684/how-to-get-the-seconds-since-epoch-from-the-time-date-output-of-gmtime
 #timeLastPKill= time.localtime()
@@ -274,7 +294,7 @@ class MyEventHandler(FileSystemEventHandler):
                time.sleep(0.1) #il faut laisser un peu de temps entre les 2 appels de gtkwave sinon il ouvre 2 fois le meme fichier
 ################################################################################
 def main():
-  print("Wokwi2gtkwave\n B. Vandeportaele IUT GEII 2021\nCan be used with multiple Logic Analyzer, processing one file for each analyzer")
+  print("Wokwi2gtkwave\n B. Vandeportaele IUT GEII 2021\nCan be used with multiple logic analyzer, processing one file for each analyzer")
   #if len(sys.argv)==2:
   #  inf=sys.argv[1]
   #  ouf=sys.argv[2]
