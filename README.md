@@ -17,7 +17,7 @@ It creates a directory containing the multiple VCD files of a simulation and man
 
 It automatically closes the old instances of gtkwave (supported only on Linux).
 
-At its origin, wokwi2gtkwave was made to repair the VCD files created by Wokwi for French Locale systems, as they contained erroneous date information that normally forbidden gtkwave to open them. Uri Shaked updated Wokwi so this so is not required anymore.
+At its origin, wokwi2gtkwave was made to repair the VCD files created by Wokwi for French Locale systems, as they contained erroneous date information that normally forbidden gtkwave to open them. Uri Shaked updated Wokwi so this is not required anymore.
 
 ## Requirements
 Wokwi2gtkwave requires this 2 software to be installed:
