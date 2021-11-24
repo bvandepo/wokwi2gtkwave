@@ -7,11 +7,11 @@ This project aims to facilitate the simulation of Arduino programs using the exc
 
 It automatically call gtkwave to display the downloaded files.
 
-It generates a gtkwave configuration file that sets the autozoom feature ON so the display allows an overview of the signals to allow the user to zoom in the region of interrest.
+It generates a gtkwave configuration file that sets the autozoom feature ON so the display provides an overview of the signals to allow the user to zoom in the region of interrest.
 
-It generates a gtkwave file that sets the different signal names and organization to avoid the annoying task of grabbing signals to the signal windows in order to view them.
+It generates a gtkwave file that sets the different signal names and organizes them to avoid the annoying task of grabbing manually the signals to the signal window.
 
-It manages the use of multiple logic analyzer components for which one VCD file is created for each logic analyzer (the name of the file being set using the attributes of the logic analyzer in the diagram.json file).
+It manages the use of multiple logic analyzer components for which one VCD file is created for each logic analyzer (the name of the different files being set using the attributes of the logic analyzer in the diagram.json file).
 
 It creates a directory containing the multiple VCD files of a simulation and manages the creation of a script (shell for Linux and bat file for Windows) in the created directory to allows the automatic opening of the different VCD files afterward.
 
