@@ -7,8 +7,6 @@ This project aims to facilitate the simulation of Arduino programs using the exc
 
 It automatically call gtkwave to display the downloaded files.
 
-It repairs the VCD files created by Wokwi for French Locale systems, as they contain erroneous date information that normally forbids gtkwave to open them.
-
 It generates a gtkwave configuration file that sets the autozoom feature ON so the display allows an overview of the signals to allow the user to zoom in the region of interrest.
 
 It generates a gtkwave file that sets the different signal names and organization to avoid the annoying task of grabbing signals to the signal windows in order to view them.
@@ -19,6 +17,7 @@ It creates a directory containing the multiple VCD files of a simulation and man
 
 It automatically closes the old instances of gtkwave (supported only on Linux).
 
+At its origin, wokwi2gtkwave was made to repair the VCD files created by Wokwi for French Locale systems, as they contained erroneous date information that normally forbidden gtkwave to open them. Uri Shaked updated Wokwi so this so is not required anymore.
 
 ## Requirements
 Wokwi2gtkwave requires this 2 software to be installed:
