@@ -23,7 +23,10 @@ It automatically closes the old instances of gtkwave (supported only on Linux).
 ## Requirements
 Wokwi2gtkwave requires this 2 software to be installed:
   - gtkwave
-  - python3 (and watchdog pip module, who is installed automatically if not installed previously)
+  - python3 >=3.6.3 has been tested 
+Wokwi2gtkwave requires Python modules that are installed automatically at startup if not installed previously
+  - watchdog to detect file downloads
+  - glob2 (for Windows only) to fetch the gtkwave executable
  
 
 # Installation and usage for Windows systems
@@ -44,7 +47,16 @@ Open a cmd windows and type:
   python wokwi2gtkwave.py
 ```
 
-wokwi2gtkwave will then observe the vcd files downloaded in C:\Users\“yourlogin”\Downloads and process them automatically to C:\Users\“yourlogin”\wokwi\vcdforgtkwave , If the user wants to keep the files for a simulation, he just has to move or copy this folder. The default directories can be changed by editing wokwi2gtkwave.py:
+If the python executable is not in your PATH environement variable, you should add its path like:
+```
+  cd C:\Users\%username%\wokwi
+  C:\directory_where_python_is_installed\python wokwi2gtkwave.py
+```
+
+You may create a .bat file with theese command to be able to start wokwi2gtkwave easily.
+
+
+wokwi2gtkwave will then observe the vcd files downloaded in C:\Users\“yourlogin”\Téléchargements or C:\Users\“yourlogin”\Downloads and process them automatically to C:\Users\“yourlogin”\wokwi\vcdforgtkwave , If the user wants to keep the files for a simulation, he just has to move or copy this folder. The default directories can be changed by editing wokwi2gtkwave.py:
 
 ```
 elif platform == "win32":
@@ -93,7 +105,7 @@ if platform == "linux" or platform == "linux2":
 
 # Installation and usage for MAC systems
 
-I've not yet tested, if you want me to add the support for this system, ask me.
+I've not yet tested, if you want me to add the support for this system, ask me by adding a message in the Issue section on Github.
 
 # Configuration of the browser to download automatically the VCD files in the download folder
 
