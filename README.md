@@ -24,7 +24,8 @@ It automatically closes the old instances of gtkwave (supported only on Linux).
 Wokwi2gtkwave requires this 2 software to be installed:
   - gtkwave
   - python3 >=3.6.3 has been tested 
-Wokwi2gtkwave requires Python modules that are installed automatically at startup if not installed previously
+  
+Wokwi2gtkwave will install automatically Python modules that it requires if they are not installed previously:
   - watchdog to detect file downloads
   - glob2 (for Windows only) to fetch the gtkwave executable
  
