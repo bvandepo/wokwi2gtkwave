@@ -7,6 +7,7 @@
 #arg pour passer les emplacements si autre que ceux par défaut
 #variables de chemin à régler plutot au début du script
 
+#TODO: ajouter téléchargement automatique de gtkwave si besoin
 
 debug=False #set to True to activate display of debug messages
   
@@ -294,7 +295,7 @@ class MyEventHandler(FileSystemEventHandler):
                time.sleep(0.1) #il faut laisser un peu de temps entre les 2 appels de gtkwave sinon il ouvre 2 fois le meme fichier
 ################################################################################
 def main():
-  print("Wokwi2gtkwave\n B. Vandeportaele IUT GEII 2021\nCan be used with multiple logic analyzer, processing one file for each analyzer")
+  print("Wokwi2gtkwave V0.1\nB. Vandeportaele IUT GEII 2021\nCan be used with multiple logic analyzers, processing one file for each analyzer\nKeep this window open!\nWaiting for new .vcd files to be downloaded in: "+directoryToScan)
   #if len(sys.argv)==2:
   #  inf=sys.argv[1]
   #  ouf=sys.argv[2]
