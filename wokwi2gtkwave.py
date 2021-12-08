@@ -36,15 +36,15 @@ else:
   pip.main(['install','watchdog'])
 ########################################
 if platform == "win32":
-'''
+  '''
   if 'glob' in installed_packages:
     if debug: print('glob pip package already installed')
   else: 
     if debug: print('glob pip package missing, lets install it')
     import pip
     pip.main(['install','glob'])
-'''    
-    import glob
+  '''    
+  import glob
 ########################################
 
  
