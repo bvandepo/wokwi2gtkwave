@@ -21,7 +21,7 @@ At its origin, wokwi2gtkwave was made to repair the VCD files created by Wokwi f
 
 ## Requirements
 Wokwi2gtkwave requires this 2 software to be installed:
-  - gtkwave
+  - gtkwave (The Windows version of wokwi2gtkwave downloads it automatically)
   - python3 >=3.6.3 has been tested 
   
 Wokwi2gtkwave will install automatically Python modules that it requires if they are not installed previously:
@@ -35,8 +35,9 @@ Wokwi2gtkwave will install automatically Python modules that it requires if they
 
 Download and install Python 3.8.6: https://bvdp.inetdoc.net/files/cesi/gtkwave/python-3.8.6-amd64.exe
 
-Create a C:\Users\“yourlogin”\wokwi directory and download  and unzip the following file in this directory: 
-https://bvdp.inetdoc.net/files/cesi/gtkwave/gtkwave-3.3.100-bin-win32.zip
+Create a C:\Users\“yourlogin”\wokwi directory 
+<!--- Previously the user had to  download  and unzip the following file in this directory: https://bvdp.inetdoc.net/files/cesi/gtkwave/gtkwave-3.3.100-bin-win32.zip
+-->
 
 Copy the wokwi2gtkwave.py file in the  C:\Users\“yourlogin”\wokwi 
 
