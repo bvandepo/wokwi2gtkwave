@@ -10,6 +10,7 @@
 #TODO: ajouter téléchargement automatique de gtkwave si besoin
 
 debug=False #set to True to activate display of debug messages
+debug=True
   
 import os
 import sys
@@ -34,21 +35,63 @@ else:
   if debug: print('watchdog pip package missing, lets install it')
   import pip
   pip.main(['install','watchdog'])
+  
+########################################################## 
+#----téléchargement  de fichier, récupéré sur https://www.programcreek.com/python/example/83386/wget.download
+def download_file(local_path, link, checksum_reference=None):
+    """Checks if a local file is present and downloads it from the specified path otherwise.
+    If checksum_reference is specified, the file's md5 checksum is compared against the
+    expected value.
+
+    Keyword arguments:
+    local_path -- path of the file whose checksum shall be generated
+    link -- link where the file shall be downloaded from if it is not found locally
+    checksum_reference -- expected MD5 checksum of the file
+    """
+    if not os.path.exists(local_path):
+        print('Downloading from %s, this may take a while...' % link)
+        wget.download(link, local_path)
+        print()
+    if checksum_reference is not None:
+        checksum = generate_md5_checksum(local_path)
+        if checksum != checksum_reference:
+            raise ValueError(
+                'The MD5 checksum of local file %s differs from %s, please manually remove \
+                 the file and try again.' %
+                (local_path, checksum_reference))
+    return local_path
 ########################################
 if platform == "win32":
-  import glob
-'''
+  import glob  
+  '''
   if 'glob' in installed_packages:
     if debug: print('glob pip package already installed')
   else: 
     if debug: print('glob pip package missing, lets install it')
     import pip
     pip.main(['install','glob'])
-'''    
+  '''
+  if 'wget' in installed_packages:
+    if debug: print('wget pip package already installed')
+  else: 
+    if debug: print('wget pip package missing, lets install it')
+    import pip
+    pip.main(['install','wget'])
+  #to get gtkwave from the web
+  import wget
+  #to unzip file
+  import shutil
+  path_to_zip_file="gtkwave-3.3.100-bin-win32.zip"
+  #download the zip file only if it does not exist
+  if not os.path.exists(path_to_zip_file):
+    print("downloading gtkwave")
+    download_file(path_to_zip_file,"https://bvdp.inetdoc.net/files/cesi/gtkwave/gtkwave-3.3.100-bin-win32.zip", checksum_reference=None)
+    directory_to_extract_to="./"
+    print("unzipping gtkwave")    
+    shutil.unpack_archive(path_to_zip_file, directory_to_extract_to)
 
 ########################################
 
- 
 #inspiré de http://sametmax.com/reagir-a-un-changement-sur-un-fichier-avec-watchdog/
 #sudo pip3 install watchdog
 from watchdog.events import FileSystemEventHandler
