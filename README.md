@@ -33,7 +33,7 @@ Wokwi2gtkwave will install automatically Python modules that it requires if they
 
 ## Installation for Windows systems
 
-Download and install Python 3.8.6: https://bvdp.inetdoc.net/files/cesi/gtkwave/python-3.8.6-amd64.exe
+Download and install Python >=3.8.6 (and check ADD TO PATH during installation) : https://bvdp.inetdoc.net/files/cesi/gtkwave/python-3.8.6-amd64.exe
 
 Create a C:\Users\“yourlogin”\wokwi directory 
 <!--- Previously the user had to  download  and unzip the following file in this directory: https://bvdp.inetdoc.net/files/cesi/gtkwave/gtkwave-3.3.100-bin-win32.zip
