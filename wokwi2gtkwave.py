@@ -99,6 +99,21 @@ from watchdog.observers import Observer
 #doc dans : https://pythonhosted.org/watchdog/api.html#watchdog.observers.Observer
 import time
 
+
+########################################
+#pour s'assurer que le fichier est bien terminé de copier:
+#https://instructobit.com/tutorial/117/Detecting-files-in-the-process-of-being-copied-or-written-to-in-Python
+def get_file_size(filepath):           
+    # open the file in read only           
+    with open(filepath, "r") as file:           
+        # move pointer to the end of the file           
+        file.seek(0, 2)           
+        # retrieve the current position of the pointer           
+        # this will be the file's size in bytes           
+        size = file.tell()           
+        return size           
+    # if the function reaches this statement it means an error occurred within the above context handler           
+    return False 
 #----------------------------------------------------
 def repairVcdFile(filename_in, filename_out):
     fin = open(filename_in, "r")
@@ -246,6 +261,15 @@ class MyEventHandler(FileSystemEventHandler):
         if os.path.isfile(event.src_path):
             if event.src_path.endswith(('.vcd')):
                print("A new vcd file has been downloaded:" + str( event.src_path))
+               #the handler may be called before the file is completely writen to the disk so check if its size is evolving and wait until it stabilizes
+               initial_size=-1
+               final_size=-2
+               while initial_size!=final_size:
+                 initial_size = get_file_size(str( event.src_path))     
+                 time.sleep(0.5) #->il faut laisser le temps que le fichier soit terminé de copier
+                 final_size = get_file_size(str( event.src_path))
+                 #print("compare "+str(initial_size) +" et " + str(final_size))
+               
                 #determine si il faut tuer gtkwave
                currentTime = int(time.time())
                if currentTime-self.timeLastPKill>10: #tue les instances anciennes de gtkwave mais pas les récentes qui peuvent etre due à des analyseurs logiques en parallèle
