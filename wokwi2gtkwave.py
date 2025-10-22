@@ -150,8 +150,44 @@ def repairVcdFile(filename_in, filename_out):
 #crée un fichier de réglage gtkwave par défaut pour l'application 
 def createRcFile(filename_out):
     fout = open(filename_out, "w")    
+    #defaultfilecontent = """do_initial_zoom_fit 1
+    #"""
     defaultfilecontent = """do_initial_zoom_fit 1
+# Fond principal (blanc)
+color_back ffffff
+
+# Texte principal (noir)
+color_normal 000000
+
+# Couleur des noms de signaux
+color_signalname 000000
+
+# Couleurs des lignes de division horizontales et verticales
+color_grid 999999
+color_hair 999999
+
+# Barre de temps
+color_time 000000
+color_timeb ffffff
+
+# Curseur de temps
+color_tname 000000
+color_cursor 000000
+
+# Marqueurs
+color_mark 000000
+color_highlight ffff99
+
+# Couleurs pour les valeurs logiques (ajuste selon ton goût)
+color_value_0 ff9999     ;# rouge clair pour 0
+color_value_1 99cc99     ;# vert clair pour 1
+color_value_x 9999cc     ;# bleu/gris pour X
+color_value_z cccccc     ;# gris clair pour Z
+
+# Texte de l'état des signaux
+color_sigs 000000
 """
+    
     #print(defaultfilecontent)
     fout.write(defaultfilecontent)          
     fout.close()   
