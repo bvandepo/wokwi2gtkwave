@@ -147,6 +147,14 @@ def repairVcdFile(filename_in, filename_out):
 
 
 ################################################################################
+#options du fichier rc sur : https://gtkwave.github.io/gtkwave/man/gtkwaverc.5.html
+#pour tester un fichier rc: 
+#  gtkwave --slider-zoom  "wokwi-logic-iut.vcd" "wokwi-logic-iut.gtkw" "/home/bvandepo/wokwi/vcdforgtkwave/gtkwaverc"  
+#Très pratique pour tester si une variable du rc est supportée
+#  gtkwave --slider-zoom  --rcvar "color_1 000000"  "wokwi-logic-iut.vcd" "wokwi-logic-iut.gtkw"
+#format des couleurs rbg en hexa et minuscules
+################################################################################
+
 #crée un fichier de réglage gtkwave par défaut pour l'application 
 def createRcFile(filename_out):
     fout = open(filename_out, "w")    
@@ -159,35 +167,28 @@ color_back ffffff
 # Texte principal (noir)
 color_normal 000000
 
-# Couleur des noms de signaux
-color_signalname 000000
+#signaux au différents niveaux (noir)
+color_0 000000
+color_1 000000
+color_high 000000
+color_low 000000
 
-# Couleurs des lignes de division horizontales et verticales
-color_grid 999999
-color_hair 999999
+#transitions/fronts (noir)
+color_trans 000000
+	
+# Couleurs des lignes de division horizontales et verticales (gris clair)
+color_grid f0f0f0
+
+#Desactive les lignes verticales de grilles (alt + G pour les afficher/masquer)
+enable_horiz_grid 0
 
 # Barre de temps
 color_time 000000
 color_timeb ffffff
 
-# Curseur de temps
-color_tname 000000
-color_cursor 000000
-
 # Marqueurs
 color_mark 000000
-color_highlight ffff99
-
-# Couleurs pour les valeurs logiques (ajuste selon ton goût)
-color_value_0 ff9999     ;# rouge clair pour 0
-color_value_1 99cc99     ;# vert clair pour 1
-color_value_x 9999cc     ;# bleu/gris pour X
-color_value_z cccccc     ;# gris clair pour Z
-
-# Texte de l'état des signaux
-color_sigs 000000
-"""
-    
+"""   
     #print(defaultfilecontent)
     fout.write(defaultfilecontent)          
     fout.close()   
@@ -308,17 +309,18 @@ class MyEventHandler(FileSystemEventHandler):
                
                 #determine si il faut tuer gtkwave
                currentTime = int(time.time())
-               if currentTime-self.timeLastPKill>10: #tue les instances anciennes de gtkwave mais pas les récentes qui peuvent etre due à des analyseurs logiques en parallèle
+               if currentTime-self.timeLastPKill>5: #tue les instances anciennes de gtkwave mais pas les récentes qui peuvent etre due à des analyseurs logiques en parallèle
                    self.timeLastPKill=currentTime
                    if platform == "linux" or platform == "linux2":
-                       commandLine="pkill gtkwave &"
+                       #replace pkill by killall because in certain cases pkill also terminates wokwi2gtkwave when launched from the terminal (outside the ilde python editor)
+                       #commandLine="pkill gtkwave &"
+                       commandLine="killall gtkwave"
                        if debug: print("running: "+commandLine)
-                       os.system(commandLine)
+                       os.system(commandLine)                   
                    isANewSimulation=True
                time.sleep(1)
                filename_in=event.src_path.replace("./","")  #nom du fichier avec chemin complet
-               basename_in=os.path.basename(filename_in)
-               
+               basename_in=os.path.basename(filename_in)               
                if debug: print("filename_in: "+filename_in)
                #commandLine="mkdir -p " + directoryforgtkwave;  print("execution de: "+commandLine); os.system(commandLine)
                try:
@@ -419,6 +421,7 @@ def main():
   except KeyboardInterrupt:
     # Ctrl + C arrête tout
     observer.stop()
+    print("bye bye, see you soon!")
   # on attend que tous les threads se terminent proprement
   observer.join()
   return
