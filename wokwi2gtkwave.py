@@ -19,6 +19,7 @@ import math
  
 import shutil
 from sys import platform
+from pathlib import Path
 
 ########################################
 #https://stackoverflow.com/questions/1051254/check-if-python-package-is-installed
@@ -412,6 +413,14 @@ class MyEventHandler(FileSystemEventHandler):
                time.sleep(0.1) #il faut laisser un peu de temps entre les 2 appels de gtkwave sinon il ouvre 2 fois le meme fichier
 ################################################################################
 def main():
+  #check if Wokwi2gtkwave is executed from a VSCode project folder and in that case set this folder for the vcd and other files
+  global directoryToScan
+  global directoryToStore
+  if any(p.name.lower() == "wokwi.toml" for p in Path.cwd().iterdir() if p.is_file()):    
+    print("running from a local VSCode project folder ")
+    directoryToScan=str(Path.cwd())
+    directoryToStore=directoryToScan
+
   print("Wokwi2gtkwave V0.1\nB. Vandeportaele IUT GEII 2021\nCan be used with multiple logic analyzers, processing one file for each analyzer\nKeep this window open!\nWaiting for new .vcd files to be downloaded in: "+directoryToScan)
   #if len(sys.argv)==2:
   #  inf=sys.argv[1]
