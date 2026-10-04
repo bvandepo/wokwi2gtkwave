@@ -82,12 +82,14 @@ if platform == "win32":
   import wget
   #to unzip file
   import shutil
+########################################
+def installGtkwaveWindows(directory_to_extract_to="./"):
   path_to_zip_file="gtkwave-3.3.100-bin-win32.zip"
   #download the zip file only if it does not exist
   if not os.path.exists(path_to_zip_file):
     print("downloading gtkwave")
     download_file(path_to_zip_file,"https://bvdp.inetdoc.net/files/cesi/gtkwave/gtkwave-3.3.100-bin-win32.zip", checksum_reference=None)
-    directory_to_extract_to="./"
+    #directory_to_extract_to="./"
     print("unzipping gtkwave")    
     shutil.unpack_archive(path_to_zip_file, directory_to_extract_to)
 
@@ -274,6 +276,10 @@ elif platform == "win32":
         break #first trial should be the good one...
       if pathForGtkwaveBin is None:
         print("gtkwave.exe cannot be found in: "+directoryToSearchGtkwave)
+        print("installing gtkwave.exe in: "+directoryToSearchGtkwave)
+        installGtkwaveWindows(directoryToSearchGtkwave)
+        print("please restart wokwi2gtkwave ")
+ 
 
 # https://stackoverflow.com/questions/4548684/how-to-get-the-seconds-since-epoch-from-the-time-date-output-of-gmtime
 #timeLastPKill= time.localtime()
@@ -419,7 +425,20 @@ def main():
   if any(p.name.lower() == "wokwi.toml" for p in Path.cwd().iterdir() if p.is_file()):    
     print("running from a local VSCode project folder ")
     directoryToScan=str(Path.cwd())
-    directoryToStore=directoryToScan
+    #directoryToStore=directoryToScan
+    #le dossier destinataire du vcd et des différents fichiers gtkwave ne doit pas être dans un sous dossier du dossier espionné par watchdog sinon il est redetecté..., mettre dans un dossier au même niveau que le dossier espionné dans l'arborescence, avec le suffixe: _vcdforgtkwave
+    if platform == "linux" or platform == "linux2":
+        #directoryToStore = str(os.path.join(directoryToScan, "vcdforgtkwave"))     
+        directoryToStore = directoryToScan+"_vcdforgtkwave"    
+    elif platform == "darwin":
+        print("OS X not yet supported")
+        exit()
+    elif platform == "win32":
+        #directoryToStore=directoryToScan+"\\vcdforgtkwave"
+        directoryToStore = directoryToScan+"_vcdforgtkwave"    
+   
+
+    
 
   print("Wokwi2gtkwave V0.1\nB. Vandeportaele IUT GEII 2021\nCan be used with multiple logic analyzers, processing one file for each analyzer\nKeep this window open!\nWaiting for new .vcd files to be downloaded in: "+directoryToScan)
   #if len(sys.argv)==2:
